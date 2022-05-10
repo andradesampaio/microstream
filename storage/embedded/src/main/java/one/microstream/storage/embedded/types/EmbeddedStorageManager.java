@@ -43,7 +43,6 @@ import one.microstream.persistence.types.PersistenceTypeDictionaryExporter;
 import one.microstream.persistence.types.Storer;
 import one.microstream.persistence.types.Unpersistable;
 import one.microstream.reference.LazyReferenceManager;
-import one.microstream.reference.Reference;
 import one.microstream.reference.Swizzling;
 import one.microstream.storage.exceptions.StorageExceptionConsistency;
 import one.microstream.storage.types.Database;
@@ -553,17 +552,6 @@ public interface EmbeddedStorageManager extends StorageManager
 		public final void importFiles(final XGettingEnum<AFile> importFiles)
 		{
 			this.singletonConnection().importFiles(importFiles);
-		}
-		
-
-		/**
-		 * @deprecated will be removed in version 8
-		 */
-		@Deprecated
-		@Override
-		public final Reference<Object> defaultRoot()
-		{
-			return this.rootReference();
 		}
 
 	}

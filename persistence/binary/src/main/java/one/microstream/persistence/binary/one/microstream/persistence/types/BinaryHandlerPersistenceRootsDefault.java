@@ -27,7 +27,6 @@ import one.microstream.collections.EqHashTable;
 import one.microstream.collections.types.XGettingTable;
 import one.microstream.persistence.binary.internal.AbstractBinaryHandlerCustom;
 import one.microstream.persistence.binary.types.Binary;
-import one.microstream.persistence.types.Persistence;
 import one.microstream.persistence.types.PersistenceFunction;
 import one.microstream.persistence.types.PersistenceLoadHandler;
 import one.microstream.persistence.types.PersistenceObjectRegistry;
@@ -178,107 +177,6 @@ extends AbstractBinaryHandlerCustom<PersistenceRoots.Default>
 		// The resolved instances need to be registered for their objectIds. Properly mapped to consider removed ones.
 		this.registerInstancesPerObjectId(resolvedRootEntries, rootIdMapping);
 	}
-	
-	/**
-	 * @deprecated this method is as deprecated as the old root concept's identifier it uses.
-	 * See {@link Persistence#customRootIdentifier()} and {@link Persistence#defaultRootIdentifier()}.
-	 */
-	@Deprecated
-	private boolean ensureRefactoredOldRoots(
-		final EqHashTable<String, Long>                 rootIdMapping,
-		final EqHashTable<String, PersistenceRootEntry> resolvedRoots,
-		final PersistenceLoadHandler                    handler
-	)
-	{
-		final Long customRootOid  = rootIdMapping.get(Persistence.customRootIdentifier());
-		final Long defaultRootOid = rootIdMapping.get(Persistence.defaultRootIdentifier());
-		
-		// quick check to abort for the non-refactoring (= normal) cases.
-		if(customRootOid == null && defaultRootOid == null)
-		{
-			return false;
-		}
-		
-		/*
-		 * Reaching here means some refactoring has to be done. There are 4 cases to be covered.
-		 * This is intentionally one big messy method to limit the deprecated conversion logic
-		 * to one single method.
-		 */
-
-		final Object root = this.rootResolverProvider.rootReference().get();
-		if(root == null)
-		{
-			// root refactoring case #1: root == null & customRoot exists
-			if(customRootOid != null)
-			{
-				final Object customRoot = handler.lookupObject(customRootOid);
-				if(customRoot == null)
-				{
-					throw new Error(
-						"Root instance missing for identifier \"" + Persistence.customRootIdentifier() + "\""
-					);
-				}
-				
-				this.rootResolverProvider.rootReference().set(customRoot);
-				resolvedRoots.add(Persistence.customRootIdentifier(), null);
-				
-				return true;
-			}
-
-			// root refactoring case #2: root == null & defaultRoot exists
-			if(defaultRootOid != null)
-			{
-				final Object defaultRoot = handler.lookupObject(defaultRootOid);
-				if(defaultRoot == null)
-				{
-					throw new Error(
-						"Root instance missing for identifier \"" + Persistence.defaultRootIdentifier() + "\""
-					);
-				}
-				if(!(defaultRoot instanceof Referencing<?>))
-				{
-					throw new Error(
-						"Inconsistently typed default root instance: " + XChars.systemString(defaultRoot)
-					);
-				}
-				
-				final Referencing<?> casted = (Referencing<?>)defaultRoot;
-				
-				// safe as storing a root reference only stores the actual instance's objectId, not the supplier.
-				this.rootResolverProvider.rootReference().setRootSupplier(() ->
-					casted.get()
-				);
-				resolvedRoots.add(Persistence.defaultRootIdentifier(), null);
-				
-				return true;
-			}
-		}
-		else
-		{
-			// root instance is not null, so it has to be associated with the existing objectIds
-
-			// root refactoring case #3: root != null & customRoot exists
-			if(customRootOid != null)
-			{
-				handler.registerCustomRootRefactoring(root, customRootOid);
-				resolvedRoots.add(Persistence.customRootIdentifier(), null);
-				
-				return true;
-			}
-
-			// root refactoring case #4: root != null & defaultRoot exists
-			if(defaultRootOid != null)
-			{
-				handler.registerDefaultRootRefactoring(root, defaultRootOid);
-				resolvedRoots.add(Persistence.defaultRootIdentifier(), null);
-				
-				return true;
-			}
-		}
-		
-		// no refactoring case found
-		return false;
-	}
 
 	private void registerInstancesPerObjectId(
 		final XGettingTable<String, PersistenceRootEntry> resolvedRootEntries,
@@ -342,6 +240,122 @@ extends AbstractBinaryHandlerCustom<PersistenceRoots.Default>
 	{
 		// the nice thing about this layout is: the references can be accessed directly as if it was a simple list
 		data.iterateListElementReferences(0, iterator);
+	}
+	
+	////////////////////////////////////////////////////////////////
+	// deprecated stuff, kept internal for backward compatibility //
+	////////////////////////////////////////////////////////////////
+
+	@Deprecated
+	private static final String defaultRootIdentifier()
+	{
+		return "defaultRoot";
+	}
+
+	@Deprecated
+	private static final String customRootIdentifier()
+	{
+		return "root";
+	}
+	
+	/**
+	 * @deprecated this method is as deprecated as the old root concept's identifier it uses.
+	 */
+	@Deprecated
+	private boolean ensureRefactoredOldRoots(
+		final EqHashTable<String, Long>                 rootIdMapping,
+		final EqHashTable<String, PersistenceRootEntry> resolvedRoots,
+		final PersistenceLoadHandler                    handler
+	)
+	{
+		final Long customRootOid  = rootIdMapping.get(customRootIdentifier());
+		final Long defaultRootOid = rootIdMapping.get(defaultRootIdentifier());
+		
+		// quick check to abort for the non-refactoring (= normal) cases.
+		if(customRootOid == null && defaultRootOid == null)
+		{
+			return false;
+		}
+		
+		/*
+		 * Reaching here means some refactoring has to be done. There are 4 cases to be covered.
+		 * This is intentionally one big messy method to limit the deprecated conversion logic
+		 * to one single method.
+		 */
+
+		final Object root = this.rootResolverProvider.rootReference().get();
+		if(root == null)
+		{
+			// root refactoring case #1: root == null & customRoot exists
+			if(customRootOid != null)
+			{
+				final Object customRoot = handler.lookupObject(customRootOid);
+				if(customRoot == null)
+				{
+					throw new Error(
+						"Root instance missing for identifier \"" + customRootIdentifier() + "\""
+					);
+				}
+				
+				this.rootResolverProvider.rootReference().set(customRoot);
+				resolvedRoots.add(customRootIdentifier(), null);
+				
+				return true;
+			}
+
+			// root refactoring case #2: root == null & defaultRoot exists
+			if(defaultRootOid != null)
+			{
+				final Object defaultRoot = handler.lookupObject(defaultRootOid);
+				if(defaultRoot == null)
+				{
+					throw new Error(
+						"Root instance missing for identifier \"" + defaultRootIdentifier() + "\""
+					);
+				}
+				if(!(defaultRoot instanceof Referencing<?>))
+				{
+					throw new Error(
+						"Inconsistently typed default root instance: " + XChars.systemString(defaultRoot)
+					);
+				}
+				
+				final Referencing<?> casted = (Referencing<?>)defaultRoot;
+				
+				// safe as storing a root reference only stores the actual instance's objectId, not the supplier.
+				this.rootResolverProvider.rootReference().setRootSupplier(() ->
+					casted.get()
+				);
+				resolvedRoots.add(defaultRootIdentifier(), null);
+				
+				return true;
+			}
+		}
+		else
+		{
+			// root instance is not null, so it has to be associated with the existing objectIds
+
+			// root refactoring case #3: root != null & customRoot exists
+			if(customRootOid != null)
+			{
+				handler.registerCustomRootRefactoring(root, customRootOid);
+				resolvedRoots.add(customRootIdentifier(), null);
+				
+				return true;
+			}
+
+			// root refactoring case #4: root != null & defaultRoot exists
+			if(defaultRootOid != null)
+			{
+				handler.registerDefaultRootRefactoring(root, defaultRootOid);
+				resolvedRoots.add(defaultRootIdentifier(), null);
+				
+				return true;
+			}
+		}
+		
+		// no refactoring case found
+		return false;
 	}
 
 }

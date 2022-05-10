@@ -1,26 +1,5 @@
 package one.microstream.storage.types;
 
-/*-
- * #%L
- * microstream-storage
- * %%
- * Copyright (C) 2019 - 2022 MicroStream Software
- * %%
- * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License 2.0 which is available at
- * http://www.eclipse.org/legal/epl-2.0.
- * 
- * This Source Code may also be made available under the following Secondary
- * Licenses when the conditions for such availability set forth in the Eclipse
- * Public License, v. 2.0 are satisfied: GNU General Public License, version 2
- * with the GNU Classpath Exception which is
- * available at https://www.gnu.org/software/classpath/license.html.
- * 
- * SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
- * #L%
- */
-
-import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -117,21 +96,6 @@ public final class Storage
 	}
 
 	/**
-	 * Alias for {@code FileProvider(storageDirectory.toPath())}
-	 *
-	 * @param storageDirectory the directory where the storage will be located.
-	 * 
-	 * @return a new {@link StorageLiveFileProvider} instance.
-	 * 
-	 * @deprecated replaced by {@link #FileProvider(Path)}, will be removed in version 8
-	 */
-	@Deprecated
-	public static final StorageLiveFileProvider FileProvider(final File storageDirectory)
-	{
-		return FileProvider(storageDirectory.toPath());
-	}
-
-	/**
 	 * Creates a new {@link StorageLiveFileProvider}.
 	 * <p>
 	 * For a detailed explanation see {@link StorageLiveFileProvider#New(ADirectory)}.
@@ -198,12 +162,6 @@ public final class Storage
 	public static final StorageBackupFileProvider BackupFileProvider()
 	{
 		return StorageBackupFileProvider.New();
-	}
-
-	@Deprecated
-	public static final StorageBackupFileProvider BackupFileProvider(final File storageDirectory)
-	{
-		return BackupFileProvider(storageDirectory.toPath());
 	}
 
 	public static final StorageBackupFileProvider BackupFileProvider(final Path storageDirectory)
@@ -547,19 +505,6 @@ public final class Storage
 	)
 	{
 		return StorageDataFileEvaluator.New(fileMinimumSize, fileMaximumSize, minimumUseRatio, cleanUpHeadFile);
-	}
-
-	/**
-	 * @param backupDirectory the directory where the backup shall be located.
-	 * 
-	 * @return a new {@link StorageBackupSetup} instance.
-	 * 
-	 * @deprecated replaced by {@link #BackupSetup(Path)}, will be removed in version 8
-	 */
-	@Deprecated
-	public static final StorageBackupSetup BackupSetup(final File backupDirectory)
-	{
-		return BackupSetup(backupDirectory.toPath());
 	}
 	
 	/**

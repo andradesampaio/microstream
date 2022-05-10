@@ -20,7 +20,6 @@
 module microstream.cache
 {
 	exports one.microstream.cache.types;
-	exports one.microstream.cache.exceptions;
 	
 	requires transitive microstream.persistence.binary;
 	requires transitive microstream.storage.embedded.configuration;
