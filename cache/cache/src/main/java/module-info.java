@@ -21,6 +21,10 @@ module microstream.cache
 {
 	exports one.microstream.cache.types;
 	
+	provides javax.cache.spi.CachingProvider
+	    with one.microstream.cache.types.CachingProvider
+	;
+	
 	requires transitive microstream.persistence.binary;
 	requires transitive microstream.storage.embedded.configuration;
 	requires transitive cache.api;
