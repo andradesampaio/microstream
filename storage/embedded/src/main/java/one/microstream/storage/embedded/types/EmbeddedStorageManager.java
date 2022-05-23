@@ -382,7 +382,11 @@ public interface EmbeddedStorageManager extends StorageManager
 				logger.debug("Storing required root objects and constants");
 				
 				// any other case than a perfectly synchronous loaded roots instance needs to store
-				initConnection.store(loadedRoots);
+				// use an eager storer to ensure that everything is updated
+				final Storer storer = initConnection.createEagerStorer();
+				storer.store(loadedRoots);
+				storer.commit();
+				
 			}
 			catch(final Exception e)
 			{
