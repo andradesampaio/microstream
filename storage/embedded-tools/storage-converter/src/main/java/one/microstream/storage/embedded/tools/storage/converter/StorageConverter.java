@@ -261,7 +261,8 @@ public class StorageConverter
 			{
 				if(file.isOpen())
 				{
-					file.close();
+					throw new RuntimeException("File still open: " + file.identifier());
+					//file.close();
 				}
 			}
 		}
