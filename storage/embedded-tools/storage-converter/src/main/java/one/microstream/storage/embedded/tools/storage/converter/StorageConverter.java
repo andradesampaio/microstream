@@ -259,7 +259,10 @@ public class StorageConverter
 			}
 			finally
 			{
-				file.close();
+				if(file.isOpen())
+				{
+					file.close();
+				}
 			}
 		}
 	}
