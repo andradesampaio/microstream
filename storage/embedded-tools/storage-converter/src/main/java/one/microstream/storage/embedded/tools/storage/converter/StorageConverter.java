@@ -148,7 +148,24 @@ public class StorageConverter
 
 		this.bufferIn = XMemory.allocateDirectNative(storageDataInventoryFile.size());
 		
-		storageDataInventoryFile.readBytes(this.bufferIn);
+		try
+		{
+			storageDataInventoryFile.readBytes(this.bufferIn);
+		}
+		finally
+		{
+			if(!storageDataInventoryFile.close())
+			{
+				throw new RuntimeException("Failed to close file " + storageDataInventoryFile.identifier());
+			}
+			
+			if(storageDataInventoryFile.isOpen())
+			{
+				throw new RuntimeException("File still open after close file " + storageDataInventoryFile.identifier());
+			}
+		}
+		
+		
 
 		final long bufferStartAddress = XMemory.getDirectByteBufferAddress(this.bufferIn);
 		final long bufferBoundAddress = bufferStartAddress + this.bufferIn.limit();
