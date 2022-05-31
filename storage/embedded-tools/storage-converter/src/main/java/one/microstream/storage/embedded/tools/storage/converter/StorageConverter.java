@@ -148,14 +148,7 @@ public class StorageConverter
 
 		this.bufferIn = XMemory.allocateDirectNative(storageDataInventoryFile.size());
 		
-		try
-		{
-			storageDataInventoryFile.readBytes(this.bufferIn);
-		}
-		finally
-		{
-			storageDataInventoryFile.close();
-		}
+		storageDataInventoryFile.readBytes(this.bufferIn);
 
 		final long bufferStartAddress = XMemory.getDirectByteBufferAddress(this.bufferIn);
 		final long bufferBoundAddress = bufferStartAddress + this.bufferIn.limit();
@@ -189,7 +182,7 @@ public class StorageConverter
 		}
 
 		this.transferRegisteredEntities();
-
+		storageDataInventoryFile.close();
 		logger.trace("Clearing current file entities.");
 		this.currentFileEntities.clear();
 	}
