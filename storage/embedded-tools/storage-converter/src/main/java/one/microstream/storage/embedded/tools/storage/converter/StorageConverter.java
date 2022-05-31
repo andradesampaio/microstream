@@ -182,7 +182,6 @@ public class StorageConverter
 		}
 
 		this.transferRegisteredEntities();
-		storageDataInventoryFile.close();
 		logger.trace("Clearing current file entities.");
 		this.currentFileEntities.clear();
 	}
@@ -236,7 +235,15 @@ public class StorageConverter
 
 		while (iterator.hasNext())
 		{
-			this.processFile(iterator.next());
+			final StorageDataInventoryFile file = iterator.next();
+			try
+			{
+				this.processFile(file);
+			}
+			finally
+			{
+				file.close();
+			}
 		}
 	}
 
