@@ -154,15 +154,7 @@ public class StorageConverter
 		}
 		finally
 		{
-			if(!storageDataInventoryFile.close())
-			{
-				throw new RuntimeException("Failed to close file " + storageDataInventoryFile.identifier());
-			}
-			
-			if(storageDataInventoryFile.isOpen())
-			{
-				throw new RuntimeException("File still open after close file " + storageDataInventoryFile.identifier());
-			}
+			storageDataInventoryFile.close();
 		}
 		
 		
@@ -253,18 +245,18 @@ public class StorageConverter
 		while (iterator.hasNext())
 		{
 			final StorageDataInventoryFile file = iterator.next();
-			try
-			{
+//			try
+//			{
 				this.processFile(file);
-			}
-			finally
-			{
-				if(file.isOpen())
-				{
-					throw new RuntimeException("File still open: " + file.identifier());
-					//file.close();
-				}
-			}
+//			}
+//			finally
+//			{
+//				if(file.isOpen())
+//				{
+//					throw new RuntimeException("File still open: " + file.identifier());
+//					//file.close();
+//				}
+//			}
 		}
 	}
 
