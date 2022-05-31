@@ -156,8 +156,6 @@ public class StorageConverter
 		{
 			storageDataInventoryFile.close();
 		}
-		
-		
 
 		final long bufferStartAddress = XMemory.getDirectByteBufferAddress(this.bufferIn);
 		final long bufferBoundAddress = bufferStartAddress + this.bufferIn.limit();
@@ -244,19 +242,7 @@ public class StorageConverter
 
 		while (iterator.hasNext())
 		{
-			final StorageDataInventoryFile file = iterator.next();
-//			try
-//			{
-				this.processFile(file);
-//			}
-//			finally
-//			{
-//				if(file.isOpen())
-//				{
-//					throw new RuntimeException("File still open: " + file.identifier());
-//					//file.close();
-//				}
-//			}
+			this.processFile(iterator.next());
 		}
 	}
 
